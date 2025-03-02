@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "ClassBlock",
+  "version": "3.2.1",
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "storage",
+    "tabs",
+    "identity",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*.supabase.co/*",
+    "https://generativelanguage.googleapis.com/"
+
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "classblocklogo.png",
+    "48": "classblocklogo.png",
+    "128": "classblocklogo.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "whitelist.json",
+        "prewhite.json",
+        "supabase.min.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.supabase.co;"
+  }
+}

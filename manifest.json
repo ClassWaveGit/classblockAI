@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Ad Blocker IA avec Gemini",
+  "version": "1.0",
+  "description": "Bloqueur de publicité utilisant l'IA via le modèle Gemini 1.5 Flash",
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ]
+}

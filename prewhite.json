@@ -1,0 +1,7 @@
+{
+    "prewhitelistedSites": [
+        "https://oauth.airmiles.ca",
+        "https://test.adminforge.de/adblock.html",
+        "https://classroom.google.com/"
+    ]
+}

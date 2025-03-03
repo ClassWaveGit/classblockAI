@@ -217,7 +217,8 @@ async function sendGeminiRequest(data) {
   const key = (randomNumber === 1) ? apiKeys[0] : apiKeys[1];
   const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
   try {
-    console.log("🌐 Sending API request.");
+    // Removed API key from console logs for security
+    console.log("🌐 Sending request to CWAI.");
     const response = await fetch(requestUrl, {
       method: 'POST',
       headers: {
@@ -226,13 +227,13 @@ async function sendGeminiRequest(data) {
       body: JSON.stringify(data)
     });
     if (response.ok) {
-      console.log("✅ Received API response successfully.");
+      console.log("✅ Received response successfully.");
       return response;
     } else {
-      console.error("❌ HTTP error from API request:", { status: response.status, statusText: response.statusText });
+      console.error("❌ HTTP Error", { status: response.status, statusText: response.statusText });
     }
   } catch (error) {
-    console.error("❌ API request error:", error);
+    console.error("❌ Error during API request:", error);
   }
   throw new Error("La requête avec la clé sélectionnée a échoué.");
 }
@@ -291,7 +292,7 @@ async function sendGeminiRequest(data) {
   try {
     const response = await sendGeminiRequest(data);
     if (!response) {
-      console.error("❌ No valid response received from API request.");
+      console.error("❌ No valid response received from the selected API key.");
       return;
     }
 

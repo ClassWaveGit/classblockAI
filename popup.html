@@ -207,11 +207,19 @@
 <body>
     <div class="container">
         <h1>ClassBlock</h1>
+        <!-- ClassBlock Toggle Switch -->
         <label class="toggle-switch">
             <input type="checkbox" id="classblock-toggle">
             <span class="slider"></span>
         </label>
         <div id="status" class="status">ClassBlock désactivé</div>
+
+        <!-- AI Toggle Switch repositioned immediately below ClassBlock Toggle -->
+        <label class="ai-toggle-switch">
+            <input type="checkbox" id="ai-toggle">
+            <span class="ai-slider"></span>
+        </label>
+        <div id="ai-status">Renforcement AI désactivé</div>
 
         <!-- Champ d'entrée pour l'URL et bouton -->
         <input type="text" id="url-input" placeholder="Entrez une URL">
@@ -219,13 +227,6 @@
 
         <!-- Conteneur pour afficher les URLs whitelistées -->
         <div id="whitelist-container"></div>
-
-        <!-- Nouveau toggle switch pour Renforcement AI -->
-        <label class="ai-toggle-switch">
-            <input type="checkbox" id="ai-toggle">
-            <span class="ai-slider"></span>
-        </label>
-        <div id="ai-status">Renforcement AI désactivé</div>
 
         <!-- Bouton de déconnexion -->
         <button id="logout-btn">Déconnexion</button>

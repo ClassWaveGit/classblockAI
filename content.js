@@ -9,7 +9,7 @@ chrome.storage.sync.get('classblockEnabled', (data) => {
   const enabled = data.classblockEnabled;
   // By default, if no data, disable classblock functions.
   DISABLE_YOUTUBE = (enabled === false);
-  console.log("Initial classblockEnabled:", enabled, "=> DISABLE_YOUTUBE:", DISABLE_YOUTUBE);
+  console.log('Initial classblockEnabled:', enabled, '=> DISABLE_YOUTUBE:', DISABLE_YOUTUBE);
 });
 
 // Listen to changes for classblockEnabled and update state accordingly.
@@ -17,7 +17,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.classblockEnabled) {
     const newEnabled = changes.classblockEnabled.newValue;
     DISABLE_YOUTUBE = (newEnabled === false);
-    console.log("Updated classblockEnabled:", newEnabled, "=> DISABLE_YOUTUBE:", DISABLE_YOUTUBE);
+    console.log('Updated classblockEnabled:', newEnabled, '=> DISABLE_YOUTUBE:', DISABLE_YOUTUBE);
   }
 });
 
@@ -26,7 +26,7 @@ chrome.storage.sync.get('aiEnabled', (data) => {
   const enabled = data.aiEnabled;
   // By default, AI is enabled if not explicitly disabled.
   DISABLE_AI = (enabled === false);
-  console.log("Initial aiEnabled:", enabled, "=> DISABLE_AI:", DISABLE_AI);
+  console.log('Initial aiEnabled:', enabled, '=> DISABLE_AI:', DISABLE_AI);
 });
 
 // Listen to changes for aiEnabled and update state.
@@ -34,7 +34,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.aiEnabled) {
     const newEnabled = changes.aiEnabled.newValue;
     DISABLE_AI = (newEnabled === false);
-    console.log("Updated aiEnabled:", newEnabled, "=> DISABLE_AI:", DISABLE_AI);
+    console.log('Updated aiEnabled:', newEnabled, '=> DISABLE_AI:', DISABLE_AI);
   }
 });
 
@@ -75,7 +75,7 @@ function skipVideoAds() {
     // Advance the video to its duration to force end of ad.
     if (video && video.duration && !isNaN(video.duration)) {
       video.currentTime = video.duration;
-      console.log("Ad forced to end.");
+      console.log('Ad forced to end.');
       adSkipped = true;
     }
 
@@ -83,14 +83,14 @@ function skipVideoAds() {
     const skipButton = document.querySelector('.ytp-ad-skip-button, .ytp-ad-skip-button-container');
     if (skipButton) {
       skipButton.click();
-      console.log("Skip Ad button clicked.");
+      console.log('Skip Ad button clicked.');
       adSkipped = true;
     }
 
     // Refresh page once after ad skip.
     if (adSkipped && !refreshTriggered) {
       refreshTriggered = true;
-      console.log("Refreshing the page in 1 second...");
+      console.log('Refreshing the page in 1 second...');
       setTimeout(() => {
         location.reload();
       }, 1000);
@@ -125,7 +125,7 @@ function restoreVideoTime() {
       video.addEventListener('loadedmetadata', function() {
         video.currentTime = parseFloat(resumeTime);
         localStorage.removeItem('YTVideoResumeTime');
-        console.log("Playback time restored:", resumeTime);
+        console.log('Playback time restored:', resumeTime);
       }, { once: true });
     } else {
       setTimeout(restoreVideoTime, 500);
@@ -166,17 +166,25 @@ if (!DISABLE_YOUTUBE) {
   window.addEventListener('load', restoreVideoTime);
 }
 
-console.log("YouTube Ad Blocker loaded with auto-refresh and resume functionality.");
+console.log('YouTube Ad Blocker loaded with auto-refresh and resume functionality.');
 
 /* ------------------------------------------
    Gemini API Content Analysis Section
 ---------------------------------------------*/
 
 // API keys for Gemini 1.5 Flash model.
-// Le premier correspond à l'API 1 et le second à l'API 2.
+// Le premier correspond à l'API 1, le second à l'API 2, le troisième à l'API 3, 
+// le quatrième à l'API 4, le cinquième à l'API 5, le sixième à l'API 6,
+// le septième à l'API 7, et le nouveau correspond à l'API 8.
 const apiKeys = [
-  'AIzaSyDsxv3QIZ6bW1UX4taPCWWbgUmHkxlRVAU',
-  'AIzaSyChZoditA795EQGN_RyRt8bMmHN3WAhLLI'
+  'AIzaSyDsxv3QIZ6bW1UX4taPCWWbgUmHkxlRVAU',  // API 1
+  'AIzaSyChZoditA795EQGN_RyRt8bMmHN3WAhLLI',  // API 2
+  'AIzaSyB_VC4fiG9uUBDmy-payEOgW7SbhSkKivo',    // API 3
+  'AIzaSyC1EZl9JdYd7BYG-nu-a42Tw4gR6PAlIDQ',    // API 4
+  'AIzaSyCW9s1x1mzK7NhWqCLaSaKr9iPFGLjNRg0',    // API 5
+  'AIzaSyA6fy6Dg8BSjSknMjKVnQ78t_d8UeVftDk',    // API 6
+  'AIzaSyDapB0EReV_rN1QHbSeNLvS7wE-kZ4eMHw',     // API 7
+  'AIzaSyDc6nMeGTT4HoKwlapF0KbqyBCmzgah2Oo'      // API 8
 ];
 
 /**
@@ -206,19 +214,19 @@ function waitForPageLoad() {
 
 /**
  * Sends a request to the Gemini API using the provided payload.
- * Cette version choisit aléatoirement entre l'API 1 et l'API 2.
+ * Cette version choisit aléatoirement entre l'API 1, l'API 2, l'API 3, l'API 4, l'API 5, l'API 6, l'API 7 et l'API 8.
  * @param {Object} data - The payload for the API call.
  * @returns {Promise<Response>} The successful response.
  */
 async function sendGeminiRequest(data) {
-  // Génère un nombre aléatoire entre 1 et 2.
-  const randomNumber = Math.floor(Math.random() * 2) + 1;
+  // Génère un nombre aléatoire entre 1 et 8.
+  const randomNumber = Math.floor(Math.random() * 8) + 1;
   // Utilise la clé correspondante.
-  const key = (randomNumber === 1) ? apiKeys[0] : apiKeys[1];
+  const key = apiKeys[randomNumber - 1];
   const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
   try {
     // Removed API key from console logs for security
-    console.log("🌐 Sending request to CWAI.");
+    console.log('🌐 Sending request to CWAI.');
     const response = await fetch(requestUrl, {
       method: 'POST',
       headers: {
@@ -227,20 +235,20 @@ async function sendGeminiRequest(data) {
       body: JSON.stringify(data)
     });
     if (response.ok) {
-      console.log("✅ Received response successfully.");
+      console.log('✅ Received response successfully.');
       return response;
     } else {
-      console.error("❌ HTTP Error", { status: response.status, statusText: response.statusText });
+      console.error('❌ HTTP Error', { status: response.status, statusText: response.statusText });
     }
   } catch (error) {
-    console.error("❌ Error during API request:", error);
+    console.error('❌ Error during API request:', error);
   }
-  throw new Error("La requête avec la clé sélectionnée a échoué.");
+  throw new Error('La requête avec la clé sélectionnée a échoué.');
 }
 
 (async function() {
   if (DISABLE_AI) {
-    console.log("AI functions disabled. Script execution cancelled.");
+    console.log('AI functions disabled. Script execution cancelled.');
     return;
   }
   

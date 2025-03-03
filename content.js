@@ -172,9 +172,12 @@ console.log("YouTube Ad Blocker loaded with auto-refresh and resume functionalit
    Gemini API Content Analysis Section
 ---------------------------------------------*/
 
-// API key and URL for Gemini 1.5 Flash model.
-const apiKey = 'AIzaSyDsxv3QIZ6bW1UX4taPCWWbgUmHkxlRVAU';
-const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
+// API keys for Gemini 1.5 Flash model.
+// Le premier correspond à l'API 1 et le second à l'API 2.
+const apiKeys = [
+  'AIzaSyDsxv3QIZ6bW1UX4taPCWWbgUmHkxlRVAU',
+  'AIzaSyChZoditA795EQGN_RyRt8bMmHN3WAhLLI'
+];
 
 /**
  * Remove markdown delimiters and unwanted text to extract JSON string.
@@ -199,6 +202,39 @@ function waitForPageLoad() {
       window.addEventListener('load', resolve);
     }
   });
+}
+
+/**
+ * Sends a request to the Gemini API using the provided payload.
+ * Cette version choisit aléatoirement entre l'API 1 et l'API 2.
+ * @param {Object} data - The payload for the API call.
+ * @returns {Promise<Response>} The successful response.
+ */
+async function sendGeminiRequest(data) {
+  // Génère un nombre aléatoire entre 1 et 2.
+  const randomNumber = Math.floor(Math.random() * 2) + 1;
+  // Utilise la clé correspondante.
+  const key = (randomNumber === 1) ? apiKeys[0] : apiKeys[1];
+  const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+  try {
+    console.log("🌐 Sending request to CWAI with key:", key);
+    const response = await fetch(requestUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    if (response.ok) {
+      console.log("✅ Received response with key:", key);
+      return response;
+    } else {
+      console.error("❌ HTTP Error with key:", key, { status: response.status, statusText: response.statusText });
+    }
+  } catch (error) {
+    console.error("❌ Error with key:", key, error);
+  }
+  throw new Error("La requête avec la clé sélectionnée a échoué.");
 }
 
 (async function() {
@@ -240,7 +276,7 @@ function waitForPageLoad() {
     `Par exemple, si tu considères que les éléments ayant les identifiants 2, 5 et 10 sont des publicités, ` +
     `ta réponse devra être :\n{"blocked": [2, 5, 10]}`;
 
-  console.log('📝 Prepared prompt for Gemini API:', {
+  console.log('📝 Prepared prompt for CWAI:', {
     promptLength: prompt.length,
     elementCount: elementData.length
   });
@@ -253,24 +289,12 @@ function waitForPageLoad() {
   };
 
   try {
-    console.log('🌐 Sending request to Gemini API...');
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      console.error('❌ HTTP Error from Gemini API:', {
-        status: response.status,
-        statusText: response.statusText
-      });
+    const response = await sendGeminiRequest(data);
+    if (!response) {
+      console.error("❌ No valid response received from the selected API key.");
       return;
     }
 
-    console.log('✅ Received response from Gemini API');
     const responseData = await response.json();
     console.log('📦 Raw API response:', responseData);
 

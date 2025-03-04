@@ -161,7 +161,7 @@
       display: inline-block;
       width: 60px;
       height: 34px;
-      margin-bottom: 10px; /* Espace entre le bouton et le texte en dessous */
+      margin-top: 15px;
     }
     .ai-toggle-switch input {
       display: none;
@@ -196,53 +196,44 @@
     input:checked + .ai-slider::before {
       transform: translateX(26px);
     }
-    /* Conteneur pour le Renforcement AI qui regroupe le bouton et le texte */
     #ai-status {
       font-size: 1rem;
       margin-top: 10px;
       font-weight: normal;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      cursor: default;
-      position: relative;
-      display: inline-block; /* Pour conserver la zone de survol précise */
-    }
-    /* Texte du Renforcement AI avec tooltip interne */
-    #ai-status .ai-text {
-      display: block;
       cursor: help;
       position: relative;
     }
-    #ai-status .tooltip {
-      visibility: hidden;
-      width: 250px;
-      background-color: rgba(0, 0, 0, 1);
-      color: #fff;
-      text-align: center;
-      border-radius: 10px;
-      padding: 10px;
-      position: absolute;
-      z-index: 1000;
-      bottom: 150%;
-      left: 50%;
-      margin-left: -125px;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      transform: translateY(10px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      pointer-events: none;
-    }
+#ai-status .tooltip {
+  visibility: hidden;
+  width: 250px;
+  background-color: rgba(0, 0, 0, 1); /* Fond opaque */
+  color: #fff;
+  text-align: center;
+  border-radius: 10px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%; /* Position the tooltip above the text */
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  transform: translateY(10px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
     #ai-status .tooltip::after {
       content: "";
       position: absolute;
-      top: 100%;
+      top: 100%; /* At the bottom of the tooltip */
       left: 50%;
       margin-left: -5px;
       border-width: 5px;
       border-style: solid;
       border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
     }
-    /* Afficher la tooltip uniquement au survol du texte */
-    #ai-status .ai-text:hover .tooltip {
+    #ai-status:hover .tooltip {
       visibility: visible;
       opacity: 1;
       transform: translateY(0);
@@ -258,15 +249,15 @@
       <span class="slider"></span>
     </label>
     <div id="status" class="status">ClassBlock désactivé</div>
-    <!-- Renforcement AI Container: Bouton et texte avec tooltip affiché uniquement lors du survol du texte -->
+    <!-- AI Toggle Switch -->
+    <label class="ai-toggle-switch">
+      <input type="checkbox" id="ai-toggle">
+      <span class="ai-slider"></span>
+    </label>
+    <!-- Tooltip container -->
     <div id="ai-status">
-      <label class="ai-toggle-switch">
-        <input type="checkbox" id="ai-toggle">
-        <span class="ai-slider"></span>
-      </label>
-      <span class="ai-text">Renforcement AI désactivé
-        <span class="tooltip">Le Renforcement AI utilise CWAI pour améliorer la détection des publicités et des contenus indésirables. Lorsqu'activé, ce sera CWAI qui détectera et enlèvera les publicités.</span>
-      </span>
+      Renforcement AI désactivé
+      <span class="tooltip">Le Renforcement AI utilise CWAI pour améliorer la détection des publicités et des contenus indésirables. Lorsqu'activé, ce sera CWAI qui détectera et enlèvera les publicités.</span>
     </div>
     <!-- Champ d'entrée pour l'URL et bouton -->
     <input type="text" id="url-input" placeholder="Entrez une URL">

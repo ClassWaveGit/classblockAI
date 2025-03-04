@@ -1,242 +1,275 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassBlock Extension - Interface</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(145deg, #6a11cb, #2575fc);
-            color: #fff;
-            overflow: hidden;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(30px);
-            border-radius: 25px;
-            padding: 40px;
-            text-align: center;
-            width: 420px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 90px;
-            height: 50px;
-            margin-top: 30px;
-        }
-        .toggle-switch input {
-            display: none;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ddd;
-            transition: 0.4s;
-            border-radius: 50px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-        }
-        .slider::before {
-            position: absolute;
-            content: "";
-            height: 38px;
-            width: 38px;
-            left: 6px;
-            bottom: 6px;
-            background-color: #fff;
-            transition: 0.4s;
-            border-radius: 50%;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        input:checked + .slider {
-            background-color: #2ecc71;
-        }
-        input:checked + .slider::before {
-            transform: translateX(40px);
-        }
-        .status {
-            margin-top: 25px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        .info-text {
-            font-size: 1rem;
-            margin-top: 20px;
-            opacity: 0.85;
-            line-height: 1.5;
-        }
-        input[type="text"] {
-            width: 80%;
-            padding: 12px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
-            margin-top: 15px;
-            background-color: #fff;
-            color: #333;
-            font-size: 1rem;
-            transition: 0.3s ease;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #2575fc;
-        }
-        button {
-            margin-top: 15px;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border-radius: 20px;
-            background-color: #2575fc;
-            color: white;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            transition: 0.3s;
-        }
-        button:hover {
-            background-color: #1d65e1;
-            transform: scale(1.05);
-        }
-        #whitelist-container {
-            margin-top: 20px;
-            text-align: left;
-        }
-        .whitelist-item {
-            margin: 10px 0;
-            font-size: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .remove-url-btn {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-radius: 12px;
-            margin-left: 10px;
-        }
-        .remove-url-btn:hover {
-            background-color: #c0392b;
-        }
-        #logout-btn {
-            margin-top: 25px;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border-radius: 20px;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            transition: 0.3s;
-        }
-        #logout-btn:hover {
-            background-color: #c0392b;
-            transform: scale(1.05);
-        }
-        .ai-toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-            margin-top: 15px;
-        }
-        .ai-toggle-switch input {
-            display: none;
-        }
-        .ai-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ddd;
-            transition: 0.4s;
-            border-radius: 34px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-        .ai-slider::before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: #fff;
-            transition: 0.4s;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        input:checked + .ai-slider {
-            background-color: #3498db;
-        }
-        input:checked + .ai-slider::before {
-            transform: translateX(26px);
-        }
-        #ai-status {
-            font-size: 1rem;
-            margin-top: 10px;
-            font-weight: normal;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClassBlock Extension - Interface</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(145deg, #6a11cb, #2575fc);
+      color: #fff;
+      overflow: hidden;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(30px);
+      border-radius: 25px;
+      padding: 40px;
+      text-align: center;
+      width: 420px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 90px;
+      height: 50px;
+      margin-top: 30px;
+    }
+    .toggle-switch input {
+      display: none;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ddd;
+      transition: 0.4s;
+      border-radius: 50px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 38px;
+      width: 38px;
+      left: 6px;
+      bottom: 6px;
+      background-color: #fff;
+      transition: 0.4s;
+      border-radius: 50%;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    input:checked + .slider {
+      background-color: #2ecc71;
+    }
+    input:checked + .slider::before {
+      transform: translateX(40px);
+    }
+    .status {
+      margin-top: 25px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .info-text {
+      font-size: 1rem;
+      margin-top: 20px;
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      margin-top: 15px;
+      background-color: #fff;
+      color: #333;
+      font-size: 1rem;
+      transition: 0.3s ease;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #2575fc;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border-radius: 20px;
+      background-color: #2575fc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #1d65e1;
+      transform: scale(1.05);
+    }
+    #whitelist-container {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .whitelist-item {
+      margin: 10px 0;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .remove-url-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 12px;
+      margin-left: 10px;
+    }
+    .remove-url-btn:hover {
+      background-color: #c0392b;
+    }
+    #logout-btn {
+      margin-top: 25px;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border-radius: 20px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
+    #logout-btn:hover {
+      background-color: #c0392b;
+      transform: scale(1.05);
+    }
+    .ai-toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      margin-top: 15px;
+    }
+    .ai-toggle-switch input {
+      display: none;
+    }
+    .ai-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ddd;
+      transition: 0.4s;
+      border-radius: 34px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .ai-slider::before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: #fff;
+      transition: 0.4s;
+      border-radius: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    input:checked + .ai-slider {
+      background-color: #3498db;
+    }
+    input:checked + .ai-slider::before {
+      transform: translateX(26px);
+    }
+    #ai-status {
+      font-size: 1rem;
+      margin-top: 10px;
+      font-weight: normal;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      cursor: help;
+      position: relative;
+    }
+#ai-status .tooltip {
+  visibility: hidden;
+  width: 250px;
+  background-color: rgba(0, 0, 0, 1); /* Fond opaque */
+  color: #fff;
+  text-align: center;
+  border-radius: 10px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%; /* Position the tooltip above the text */
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  transform: translateY(10px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+    #ai-status .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%; /* At the bottom of the tooltip */
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+    }
+    #ai-status:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>ClassBlock</h1>
-        <!-- ClassBlock Toggle Switch -->
-        <label class="toggle-switch">
-            <input type="checkbox" id="classblock-toggle">
-            <span class="slider"></span>
-        </label>
-        <div id="status" class="status">ClassBlock désactivé</div>
-
-        <!-- AI Toggle Switch repositioned immediately below ClassBlock Toggle -->
-        <label class="ai-toggle-switch">
-            <input type="checkbox" id="ai-toggle">
-            <span class="ai-slider"></span>
-        </label>
-        <div id="ai-status">Renforcement AI désactivé</div>
-
-        <!-- Champ d'entrée pour l'URL et bouton -->
-        <input type="text" id="url-input" placeholder="Entrez une URL">
-        <button id="add-url-btn">Ajouter à la liste blanche</button>
-
-        <!-- Conteneur pour afficher les URLs whitelistées -->
-        <div id="whitelist-container"></div>
-
-        <!-- Bouton de déconnexion -->
-        <button id="logout-btn">Déconnexion</button>
-
-        <div class="info-text">Activez ou désactivez ClassBlock pour gérer le blocage des publicités et contenus.</div>
+  <div class="container">
+    <h1>ClassBlock</h1>
+    <!-- ClassBlock Toggle Switch -->
+    <label class="toggle-switch">
+      <input type="checkbox" id="classblock-toggle">
+      <span class="slider"></span>
+    </label>
+    <div id="status" class="status">ClassBlock désactivé</div>
+    <!-- AI Toggle Switch -->
+    <label class="ai-toggle-switch">
+      <input type="checkbox" id="ai-toggle">
+      <span class="ai-slider"></span>
+    </label>
+    <!-- Tooltip container -->
+    <div id="ai-status">
+      Renforcement AI désactivé
+      <span class="tooltip">Le Renforcement AI utilise CWAI pour améliorer la détection des publicités et des contenus indésirables. Lorsqu'activé, ce sera CWAI qui détectera et enlèvera les publicités.</span>
     </div>
-
-    <!-- Supabase SDK -->
-    <script src="supabase.min.js"></script>
-    <script src="popup.js"></script>
-
+    <!-- Champ d'entrée pour l'URL et bouton -->
+    <input type="text" id="url-input" placeholder="Entrez une URL">
+    <button id="add-url-btn">Ajouter à la liste blanche</button>
+    <!-- Conteneur pour afficher les URLs whitelistées -->
+    <div id="whitelist-container"></div>
+    <!-- Bouton de déconnexion -->
+    <button id="logout-btn">Déconnexion</button>
+    <div class="info-text">Activez ou désactivez ClassBlock pour gérer le blocage des publicités et contenus.</div>
+  </div>
+  <!-- Supabase SDK -->
+  <script src="supabase.min.js"></script>
+  <script src="popup.js"></script>
 </body>
 </html>

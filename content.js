@@ -172,19 +172,29 @@ console.log('YouTube Ad Blocker loaded with auto-refresh and resume functionalit
    Gemini API Content Analysis Section
 ---------------------------------------------*/
 
-// API keys for Gemini 1.5 Flash model.
-// Le premier correspond à l'API 1, le second à l'API 2, le troisième à l'API 3, 
-// le quatrième à l'API 4, le cinquième à l'API 5, le sixième à l'API 6,
-// le septième à l'API 7, et le nouveau correspond à l'API 8.
+// Décode une chaîne encodée deux fois en base64.
+function doubleBase64Decode(encodedStr) {
+  try {
+    // Première décodage
+    const firstDecode = atob(encodedStr);
+    // Deuxième décodage
+    return atob(firstDecode);
+  } catch (error) {
+    console.error('Erreur lors du décodage double base64:', error);
+    return '';
+  }
+}
+
+// API keys pour Gemini 1.5 Flash model (encodées deux fois en base64).
 const apiKeys = [
-  'AIzaSyDsxv3QIZ6bW1UX4taPCWWbgUmHkxlRVAU',  // API 1
-  'AIzaSyChZoditA795EQGN_RyRt8bMmHN3WAhLLI',  // API 2
-  'AIzaSyB_VC4fiG9uUBDmy-payEOgW7SbhSkKivo',    // API 3
-  'AIzaSyC1EZl9JdYd7BYG-nu-a42Tw4gR6PAlIDQ',    // API 4
-  'AIzaSyCW9s1x1mzK7NhWqCLaSaKr9iPFGLjNRg0',    // API 5
-  'AIzaSyA6fy6Dg8BSjSknMjKVnQ78t_d8UeVftDk',    // API 6
-  'AIzaSyDapB0EReV_rN1QHbSeNLvS7wE-kZ4eMHw',     // API 7
-  'AIzaSyDc6nMeGTT4HoKwlapF0KbqyBCmzgah2Oo'      // API 8
+  'UVVsNllWTjVSSE40ZGpOUlNWbzJZbGN4VlZnMGRHRlFRMWRYWW1kVmJVaHJlR3hTVmtGVg==',  // API 1
+  'UVVsNllWTjVRMmhhYjJScGRFRTNPVFZGVVVkT1gxSjVVblE0WWsxdFNFNHpWMEZvVEV4Sg==',  // API 2
+  'UVVsNllWTjVRbDlXUXpSbWFVYzVkVlZDUkcxNUxYQmhlVVZQWjFjM1UySm9VMnRMYVhadg==',    // API 3
+  'UVVsNllWTjVRekZGV213NVNtUlpaRGRDV1VjdGJuVXRZVFF5VkhjMFoxSTJVRUZzU1VSUg==',    // API 4
+  'UVVsNllWTjVRMWM1Y3pGNE1XMTZTemRPYUZkeFEweGhVMkZMY2pscFVFWkhUR3BPVW1jdw==',    // API 5
+  'UVVsNllWTjVRVFptZVRaRVp6aENVMnBUYTI1TmFrdFdibEUzT0hSZlpEaFZaVlptZEVScg==',    // API 6
+  'UVVsNllWTjVSR0Z3UWpCRlVtVldYM0pPTVZGSVlsTmxUa3gyVXpkM1JTMXJXalJsVFVoMw==',     // API 7
+  'UVVsNllWTjVSR00yYmsxbFIxUlVORWh2UzNkc1lYQkdNRXRpY1hsQ1EyMTZaMkZvTWs5dg=='      // API 8
 ];
 
 /**
@@ -214,15 +224,17 @@ function waitForPageLoad() {
 
 /**
  * Sends a request to the Gemini API using the provided payload.
- * Cette version choisit aléatoirement entre l'API 1, l'API 2, l'API 3, l'API 4, l'API 5, l'API 6, l'API 7 et l'API 8.
+ * Cette version choisit aléatoirement entre l'API 1 à l'API 8.
+ * Avant l'envoi, la clé API est décodée deux fois en base64.
  * @param {Object} data - The payload for the API call.
  * @returns {Promise<Response>} The successful response.
  */
 async function sendGeminiRequest(data) {
   // Génère un nombre aléatoire entre 1 et 8.
   const randomNumber = Math.floor(Math.random() * 8) + 1;
-  // Utilise la clé correspondante.
-  const key = apiKeys[randomNumber - 1];
+  // Récupère et décode la clé correspondante.
+  const encodedKey = apiKeys[randomNumber - 1];
+  const key = doubleBase64Decode(encodedKey);
   const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
   try {
     // Removed API key from console logs for security

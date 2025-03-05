@@ -214,36 +214,40 @@ function waitForPageLoad() {
 
 /**
  * Sends a request to the Gemini API using the provided payload.
- * Cette version choisit aléatoirement entre l'API 1, l'API 2, l'API 3, l'API 4, l'API 5, l'API 6, l'API 7 et l'API 8.
+ * Cette version effectue plusieurs tentatives avec différentes clés API en cas d'erreur.
  * @param {Object} data - The payload for the API call.
+ * @param {number} [maxAttempts=3] - Maximum number of retry attempts.
  * @returns {Promise<Response>} The successful response.
  */
-async function sendGeminiRequest(data) {
-  // Génère un nombre aléatoire entre 1 et 8.
-  const randomNumber = Math.floor(Math.random() * 8) + 1;
-  // Utilise la clé correspondante.
-  const key = apiKeys[randomNumber - 1];
-  const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-  try {
-    // Removed API key from console logs for security
-    console.log('🌐 Sending request to CWAI.');
-    const response = await fetch(requestUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    if (response.ok) {
-      console.log('✅ Received response successfully.');
-      return response;
-    } else {
-      console.error('❌ HTTP Error', { status: response.status, statusText: response.statusText });
+async function sendGeminiRequest(data, maxAttempts = 3) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    // Génère un nombre aléatoire entre 1 et 8 pour sélectionner une clé API.
+    const randomNumber = Math.floor(Math.random() * 8) + 1;
+    const key = apiKeys[randomNumber - 1];
+    const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+    try {
+      console.log(\`🌐 Sending request to CWAI (attempt \${attempt}) using API key #\${randomNumber}.\`);
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        console.log(\`✅ Received response successfully on attempt \${attempt}.\`);
+        return response;
+      } else {
+        console.error(\`❌ HTTP Error on attempt \${attempt} with API key #\${randomNumber}:\`, { status: response.status, statusText: response.statusText });
+      }
+    } catch (error) {
+      console.error(\`❌ Error on attempt \${attempt} with API key #\${randomNumber}:\`, error);
     }
-  } catch (error) {
-    console.error('❌ Error during API request:', error);
+    if (attempt < maxAttempts) {
+      console.log(\`🔄 Retrying with a different API key (attempt \${attempt + 1}/\${maxAttempts})...\`);
+    }
   }
-  throw new Error('La requête avec la clé sélectionnée a échoué.');
+  throw new Error('La requête a échoué après plusieurs tentatives avec différentes clés API.');
 }
 
 (async function() {
@@ -258,7 +262,7 @@ async function sendGeminiRequest(data) {
 
   // Gather elements (<div> and <iframe>) for analysis.
   const elements = document.querySelectorAll('div, iframe');
-  console.log(`📊 Found ${elements.length} elements (div/iframe) to analyze`);
+  console.log(\`📊 Found \${elements.length} elements (div/iframe) to analyze\`);
 
   let elementData = [];
 
@@ -270,20 +274,20 @@ async function sendGeminiRequest(data) {
     } else {
       snippet = el.innerText ? el.innerText.substring(0, 200) : '';
     }
-    elementData.push(`ID ${index}: ${snippet}`);
+    elementData.push(\`ID \${index}: \${snippet}\`);
   });
 
   // Build prompt for Gemini.
   const prompt =
-    `Tu es un analyseur de contenu pour des pages web. ` +
-    `Voici une liste d'éléments extraits de la page, chacun numéroté avec un identifiant suivi de son contenu textuel :\n` +
+    \`Tu es un analyseur de contenu pour des pages web. \` +
+    \`Voici une liste d'éléments extraits de la page, chacun numéroté avec un identifiant suivi de son contenu textuel :\n\` +
     elementData.join('\n') +
-    `\n\n` +
-    `Ta tâche est d'identifier lesquels de ces éléments correspondent à des publicités.` +
-    ` Merci de renvoyer uniquement un objet JSON au format suivant, sans aucun texte supplémentaire :\n` +
-    `{"blocked": [numéros]}\n` +
-    `Par exemple, si tu considères que les éléments ayant les identifiants 2, 5 et 10 sont des publicités, ` +
-    `ta réponse devra être :\n{"blocked": [2, 5, 10]}`;
+    \n\n +
+    \`Ta tâche est d'identifier lesquels de ces éléments correspondent à des publicités.\` +
+    \` Merci de renvoyer uniquement un objet JSON au format suivant, sans aucun texte supplémentaire :\n\` +
+    \`{"blocked": [numéros]}\n\` +
+    \`Par exemple, si tu considères que les éléments ayant les identifiants 2, 5 et 10 sont des publicités, \` +
+    \`ta réponse devra être :\n{"blocked": [2, 5, 10]}\`;
 
   console.log('📝 Prepared prompt for CWAI:', {
     promptLength: prompt.length,
@@ -335,20 +339,20 @@ async function sendGeminiRequest(data) {
 
     // Hide elements identified as advertisements.
     if (result.blocked && Array.isArray(result.blocked)) {
-      console.log(`🚫 Hiding ${result.blocked.length} elements identified as ads`);
+      console.log(\`🚫 Hiding \${result.blocked.length} elements identified as ads\`);
       result.blocked.forEach(id => {
-        const elToHide = document.querySelector(`[data-ad-blocker-id="${id}"]`);
+        const elToHide = document.querySelector(\`[data-ad-blocker-id="\${id}"]\`);
         if (elToHide) {
           const rect = elToHide.getBoundingClientRect();
           if (rect.width >= window.innerWidth * 0.9 &&
               rect.height >= window.innerHeight * 0.9) {
-            console.log(`⚠️ Skipping hiding element with ID ${id} because it covers most of the screen.`);
+            console.log(\`⚠️ Skipping hiding element with ID \${id} because it covers most of the screen.\`);
             return;
           }
           elToHide.style.setProperty('display', 'none', 'important');
-          console.log(`✂️ Hidden element with ID ${id}`);
+          console.log(\`✂️ Hidden element with ID \${id}\`);
         } else {
-          console.log(`⚠️ Could not find element with ID ${id}`);
+          console.log(\`⚠️ Could not find element with ID \${id}\`);
         }
       });
     } else {

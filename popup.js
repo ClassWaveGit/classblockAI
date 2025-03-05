@@ -9,21 +9,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13Z3VpYXh4eXZsbmZkZGV2empkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0NDY5OTIsImV4cCI6MjA1MDAyMjk5Mn0.U5bixZNP697H0A5rM9g69yXWJZfP0z98LX-Y44glSic';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // AI Toggle Functionality
     const aiToggle = document.getElementById('ai-toggle');
     const aiStatus = document.getElementById('ai-status');
 
-    // Update the AI status text without overwriting the tooltip element.
+    // Update the AI status text while preserving the tooltip element.
     const updateAIStatusText = (isEnabled) => {
-        if (aiStatus) {
-            // Look for an existing text node at the start of aiStatus
-            let statusNode = aiStatus.firstChild;
-            if (!statusNode || statusNode.nodeType !== Node.TEXT_NODE) {
-                // Create a new text node if one doesn't exist yet
-                statusNode = document.createTextNode('');
-                aiStatus.insertBefore(statusNode, aiStatus.firstChild);
-            }
-            // Update the text while preserving any child elements (like the tooltip)
-            statusNode.textContent = isEnabled ? 'Renforcement AI activé 🤖' : 'Renforcement AI désactivé ❌';
+        const aiStatus = document.getElementById('ai-status');
+        if (!aiStatus) return;
+        const tooltip = aiStatus.querySelector('.tooltip');
+        aiStatus.innerHTML = "";
+  
+        const textSpan = document.createElement('span');
+        textSpan.className = 'ai-status-text';
+        textSpan.style.textDecoration = 'underline';
+        textSpan.textContent = isEnabled ? 'Renforcement AI activé' : 'Renforcement AI désactivé';
+  
+        const emojiSpan = document.createElement('span');
+        emojiSpan.className = 'emoji';
+        emojiSpan.style.textDecoration = 'none';
+        // Ajout de display inline-block pour éviter l'underline héritée et marge-gauche pour l'espacement
+        emojiSpan.style.display = 'inline-block';
+        emojiSpan.style.marginLeft = '5px';
+        emojiSpan.textContent = isEnabled ? '🤖' : '❌';
+  
+        aiStatus.appendChild(textSpan);
+        aiStatus.appendChild(emojiSpan);
+  
+        if (tooltip) {
+            aiStatus.appendChild(tooltip);
         }
     };
 
@@ -50,13 +64,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Utility function to update the ClassBlock status text in the UI
+    // Utility function to update the ClassBlock status text in the UI.
+    // Note: This function replaces the text node of the 'status' element.
     const updateStatusText = (isEnabled) => {
         const status = document.getElementById('status');
-        status.textContent = isEnabled ? 'ClassBlock est activé 👍' : 'ClassBlock désactivé ❌';
+        if (!status) return;
+        // Récupérer la tooltip existante si présente.
+        const tooltip = status.querySelector('.tooltip');
+        // Réinitialiser le contenu du conteneur.
+        status.innerHTML = "";
+  
+        // Création du span pour le texte souligné sans espace final.
+        const textSpan = document.createElement('span');
+        textSpan.className = 'status-text';
+        textSpan.style.textDecoration = 'underline';
+        textSpan.textContent = isEnabled ? 'ClassBlock est activé' : 'ClassBlock désactivé';
+  
+        // Création du span pour l’emoji qui ne sera pas souligné.
+        const emojiSpan = document.createElement('span');
+        emojiSpan.className = 'emoji';
+        emojiSpan.style.textDecoration = 'none';
+        // Ajout de display inline-block pour éviter l'héritage de l'underline, et une marge pour l'espacement
+        emojiSpan.style.display = 'inline-block';
+        emojiSpan.style.marginLeft = '5px';
+        emojiSpan.textContent = isEnabled ? '👍' : '❌';
+  
+        // Ajouter les spans au conteneur.
+        status.appendChild(textSpan);
+        status.appendChild(emojiSpan);
+  
+        // Réinsérer la tooltip si elle existait.
+        if (tooltip) {
+            status.appendChild(tooltip);
+        }
     };
+  
 
-    // Function to load the whitelist from the background process
+    // Function to load the whitelist from the background process.
     const loadWhitelist = () => {
         chrome.runtime.sendMessage({ action: 'getWhitelist' }, (response) => {
             if (response.success) {
@@ -65,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Display the whitelist in the popup
+    // Display the whitelist in the popup.
     const displayWhitelist = (whitelist) => {
         const whitelistContainer = document.getElementById('whitelist-container');
         whitelistContainer.innerHTML = '';
@@ -84,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Normalize URL to display only the hostname if possible
+    // Normalize URL to display only the hostname if possible.
     const normalizeUrl = (url) => {
         try {
             const urlObject = new URL(url);
@@ -94,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Function to add a URL to the whitelist
+    // Function to add a URL to the whitelist.
     const addUrlToWhitelist = (url) => {
         chrome.runtime.sendMessage({ action: 'addUrlToWhitelist', url }, (response) => {
             if (response.success) {
@@ -105,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Function to remove a URL from the whitelist
+    // Function to remove a URL from the whitelist.
     const removeUrlFromWhitelist = (url) => {
         chrome.runtime.sendMessage({ action: 'removeUrlFromWhitelist', url }, (response) => {
             if (response.success) {
@@ -114,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Function to load and setup the ClassBlock UI components
+    // Function to load and set up the ClassBlock UI components.
     function loadClassBlockUI() {
         const toggle = document.getElementById('classblock-toggle');
         const status = document.getElementById('status');
@@ -122,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const urlInput = document.getElementById('url-input');
         const logoutButton = document.getElementById('logout-btn');
 
-        // Load extension state for ClassBlock
+        // Load extension state for ClassBlock.
         chrome.storage.sync.get('classblockEnabled', (data) => {
             toggle.checked = data.classblockEnabled !== undefined ? data.classblockEnabled : false;
             updateStatusText(toggle.checked);
@@ -133,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateStatusText(isEnabled);
             chrome.storage.sync.set({ classblockEnabled: isEnabled });
             chrome.runtime.sendMessage({ action: 'toggleClassBlock', isEnabled });
-            // Log explicit state not only as a boolean but also as a string representation
+            // Log state explicitly as both a boolean and a string.
             chrome.storage.sync.set({ classblockEnabled: isEnabled }, () => {
                 console.log("ClassBlock status stored as:", isEnabled ? "on" : "off");
             });
@@ -152,38 +196,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // Load the whitelist on startup
+        // Load the whitelist on startup.
         loadWhitelist();
 
-        // Handle the logout button click
+        // Handle the logout button click.
         logoutButton.addEventListener('click', async () => {
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Erreur lors de la déconnexion :', error.message);
             } else {
-                // Send message to disable filtering
+                // Send message to disable filtering.
                 chrome.runtime.sendMessage({ action: 'disableFilterOnLogout' });
-                window.location.href = 'login.html'; // Redirect after sign-out
+                window.location.href = 'login.html'; // Redirect after sign-out.
             }
         });
     }
 
-    // Check auth state on page load
+    // Verify auth state on page load.
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
         chrome.runtime.sendMessage({ action: 'disableFilterOnLogout' });
         window.location.href = 'login.html';
-        return; // Stop execution if no session exists
+        return; // Stop execution if no session exists.
     }
 
-    // Load ClassBlock UI components
+    // Load ClassBlock UI components.
     loadClassBlockUI();
 
-    // Listen for auth state changes
+    // Listen for auth state changes.
     supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') {
             chrome.runtime.sendMessage({ action: 'disableFilterOnLogout' });
-            window.location.href = 'login.html'; // Redirect if user signs out
+            window.location.href = 'login.html'; // Redirect if user signs out.
         }
     });
 });

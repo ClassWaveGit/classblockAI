@@ -76,8 +76,64 @@
     .status {
       margin-top: 25px;
       font-size: 1.5rem;
-      font-weight: bold;
+      font-weight: bold; /* classblock status text remains bold */
+      text-decoration: underline; /* Underline status text */
       text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      cursor: help;
+      position: relative;
+    }
+    /* Underline for AI status text as well */
+    #ai-status {
+      font-size: 1rem;
+      margin-top: 10px;
+      font-weight: normal;
+      text-decoration: underline; /* Underline AI status text */
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      cursor: help;
+      position: relative;
+    }
+    /* Unified tooltip styling for both classblock and AI; tooltip text in normal weight and not underlined */
+    .status .tooltip,
+    #ai-status .tooltip {
+      visibility: hidden;
+      width: 250px;
+      background-color: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      text-align: center;
+      border-radius: 10px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 150%;
+      left: 50%;
+      margin-left: -125px;
+      opacity: 0;
+      /* No delay by default when transitioning out */
+      transition: opacity 0.3s 0s, transform 0.3s 0s;
+      transform: translateY(10px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      font-size: 1rem;
+      font-weight: normal;
+      text-decoration: none; /* Remove underline for tooltip text */
+    }
+    .status .tooltip::after,
+    #ai-status .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+    }
+    .status:hover .tooltip,
+    #ai-status:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+      /* Delay before tooltip appears on hover: 0.5 sec adjusted as needed */
+      transition-delay: 0.5s;
     }
     .info-text {
       font-size: 1rem;
@@ -196,48 +252,6 @@
     input:checked + .ai-slider::before {
       transform: translateX(26px);
     }
-    #ai-status {
-      font-size: 1rem;
-      margin-top: 10px;
-      font-weight: normal;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      cursor: help;
-      position: relative;
-    }
-#ai-status .tooltip {
-  visibility: hidden;
-  width: 250px;
-  background-color: rgba(0, 0, 0, 1); /* Fond opaque */
-  color: #fff;
-  text-align: center;
-  border-radius: 10px;
-  padding: 10px;
-  position: absolute;
-  z-index: 1;
-  bottom: 150%; /* Position the tooltip above the text */
-  left: 50%;
-  margin-left: -125px;
-  opacity: 0;
-  transition: opacity 0.3s, transform 0.3s;
-  transform: translateY(10px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-    #ai-status .tooltip::after {
-      content: "";
-      position: absolute;
-      top: 100%; /* At the bottom of the tooltip */
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
-    }
-    #ai-status:hover .tooltip {
-      visibility: visible;
-      opacity: 1;
-      transform: translateY(0);
-    }
   </style>
 </head>
 <body>
@@ -248,23 +262,26 @@
       <input type="checkbox" id="classblock-toggle">
       <span class="slider"></span>
     </label>
-    <div id="status" class="status">ClassBlock désactivé</div>
+    <div id="status" class="status">
+      ClassBlock désactivé
+      <span class="tooltip">Lorsqu'activé, ClassBlock bloque la grande majorité des publicités et des trackeurs.</span>
+    </div>
     <!-- AI Toggle Switch -->
     <label class="ai-toggle-switch">
       <input type="checkbox" id="ai-toggle">
       <span class="ai-slider"></span>
     </label>
-    <!-- Tooltip container -->
+    <!-- Tooltip container for AI -->
     <div id="ai-status">
       Renforcement AI désactivé
       <span class="tooltip">Le Renforcement AI utilise CWAI pour améliorer la détection des publicités et des contenus indésirables. Lorsqu'activé, ce sera CWAI qui détectera et enlèvera les publicités.</span>
     </div>
-    <!-- Champ d'entrée pour l'URL et bouton -->
+    <!-- Input field for URL and button -->
     <input type="text" id="url-input" placeholder="Entrez une URL">
     <button id="add-url-btn">Ajouter à la liste blanche</button>
-    <!-- Conteneur pour afficher les URLs whitelistées -->
+    <!-- Container for whitelist URLs -->
     <div id="whitelist-container"></div>
-    <!-- Bouton de déconnexion -->
+    <!-- Logout button -->
     <button id="logout-btn">Déconnexion</button>
     <div class="info-text">Activez ou désactivez ClassBlock pour gérer le blocage des publicités et contenus.</div>
   </div>

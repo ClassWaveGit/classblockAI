@@ -9,23 +9,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13Z3VpYXh4eXZsbmZkZGV2empkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0NDY5OTIsImV4cCI6MjA1MDAyMjk5Mn0.U5bixZNP697H0A5rM9g69yXWJZfP0z98LX-Y44glSic';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
-
-
-
     const aiToggle = document.getElementById('ai-toggle');
     const aiStatus = document.getElementById('ai-status');
 
-    // Fonction utilitaire pour mettre à jour le texte du statut AI
+    // Update the AI status text without overwriting the tooltip element.
     const updateAIStatusText = (isEnabled) => {
         if (aiStatus) {
-            aiStatus.textContent = isEnabled ? 'AI est activé 🤖' : 'AI désactivé ❌';
+            // Look for an existing text node at the start of aiStatus
+            let statusNode = aiStatus.firstChild;
+            if (!statusNode || statusNode.nodeType !== Node.TEXT_NODE) {
+                // Create a new text node if one doesn't exist yet
+                statusNode = document.createTextNode('');
+                aiStatus.insertBefore(statusNode, aiStatus.firstChild);
+            }
+            // Update the text while preserving any child elements (like the tooltip)
+            statusNode.textContent = isEnabled ? 'Renforcement AI activé 🤖' : 'Renforcement AI désactivé ❌';
         }
-        // Vous pouvez également modifier d'autres styles ou comportements liés à l'apparence ici
     };
 
     if (aiToggle) {
-        // Charger l'état stocké pour AI depuis chrome.storage
+        // Load stored AI state from chrome.storage
         chrome.storage.sync.get('aiEnabled', (data) => {
             aiToggle.checked = data.aiEnabled !== undefined ? data.aiEnabled : false;
             updateAIStatusText(aiToggle.checked);
@@ -34,26 +37,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         aiToggle.addEventListener('change', () => {
             const isAIEnabled = aiToggle.checked;
             updateAIStatusText(isAIEnabled);
-            // Stockage de l'état booléen
+            // Store boolean state
             chrome.storage.sync.set({ aiEnabled: isAIEnabled }, () => {
                 console.log("AI status stored as:", isAIEnabled ? "on" : "off");
             });
-            // Stockage explicite de l'état en tant que chaîne
+            // Store explicit state as a string
             chrome.storage.sync.set({ aiStatus: isAIEnabled ? "on" : "off" }, () => {
                 console.log("AI explicit status stored as:", isAIEnabled ? "on" : "off");
             });
-            // Optionnel : envoyer un message d'action spécifique pour AI si nécessaire
+            // Optional: send a specific action message for AI if needed
             chrome.runtime.sendMessage({ action: 'toggleAI', isEnabled: isAIEnabled });
         });
     }
 
-    // Utility function to update the status text in the UI
+    // Utility function to update the ClassBlock status text in the UI
     const updateStatusText = (isEnabled) => {
         const status = document.getElementById('status');
         status.textContent = isEnabled ? 'ClassBlock est activé 👍' : 'ClassBlock désactivé ❌';
     };
 
-    // Function to load the whitelist from the background script
+    // Function to load the whitelist from the background process
     const loadWhitelist = () => {
         chrome.runtime.sendMessage({ action: 'getWhitelist' }, (response) => {
             if (response.success) {
@@ -62,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Function to display the whitelist in the popup
+    // Display the whitelist in the popup
     const displayWhitelist = (whitelist) => {
         const whitelistContainer = document.getElementById('whitelist-container');
         whitelistContainer.innerHTML = '';
@@ -81,13 +84,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Normalize URL to display only the hostname, if possible
+    // Normalize URL to display only the hostname if possible
     const normalizeUrl = (url) => {
         try {
             const urlObject = new URL(url);
             return urlObject.hostname;
         } catch (e) {
-            return url; // Return the original URL if invalid
+            return url; // Return original URL if invalid
         }
     };
 
@@ -117,10 +120,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const status = document.getElementById('status');
         const addUrlButton = document.getElementById('add-url-btn');
         const urlInput = document.getElementById('url-input');
-        const whitelistContainer = document.getElementById('whitelist-container');
         const logoutButton = document.getElementById('logout-btn');
 
-        // Charger l'état de l'extension
+        // Load extension state for ClassBlock
         chrome.storage.sync.get('classblockEnabled', (data) => {
             toggle.checked = data.classblockEnabled !== undefined ? data.classblockEnabled : false;
             updateStatusText(toggle.checked);
@@ -131,11 +133,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateStatusText(isEnabled);
             chrome.storage.sync.set({ classblockEnabled: isEnabled });
             chrome.runtime.sendMessage({ action: 'toggleClassBlock', isEnabled });
-            // Journalisation explicite en stockant l'état "on" ou "off"
+            // Log explicit state not only as a boolean but also as a string representation
             chrome.storage.sync.set({ classblockEnabled: isEnabled }, () => {
                 console.log("ClassBlock status stored as:", isEnabled ? "on" : "off");
             });
-            // Ajout : Stocke explicitement l'état en tant que "on" ou "off"
             chrome.storage.sync.set({ classblockStatus: isEnabled ? "on" : "off" }, () => {
                 console.log("ClassBlock explicit status stored as:", isEnabled ? "on" : "off");
             });
@@ -151,38 +152,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // Charger la whitelist au démarrage
+        // Load the whitelist on startup
         loadWhitelist();
 
-        // Gestion du bouton de déconnexion
+        // Handle the logout button click
         logoutButton.addEventListener('click', async () => {
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Erreur lors de la déconnexion :', error.message);
             } else {
-                // Envoyer un message pour désactiver le filtrage
+                // Send message to disable filtering
                 chrome.runtime.sendMessage({ action: 'disableFilterOnLogout' });
-                window.location.href = 'login.html'; // Rediriger après déconnexion
+                window.location.href = 'login.html'; // Redirect after sign-out
             }
         });
     }
 
-    // Vérifier l'état de connexion au chargement de la page
+    // Check auth state on page load
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
         chrome.runtime.sendMessage({ action: 'disableFilterOnLogout' });
         window.location.href = 'login.html';
-        return; // Arrêter l'exécution si l'utilisateur n'est pas connecté
+        return; // Stop execution if no session exists
     }
 
-    // Charger l'interface de ClassBlock
+    // Load ClassBlock UI components
     loadClassBlockUI();
 
-    // Écouter les changements d'état d'authentification
+    // Listen for auth state changes
     supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') {
             chrome.runtime.sendMessage({ action: 'disableFilterOnLogout' });
-            window.location.href = 'login.html'; // Rediriger si l'utilisateur se déconnecte
+            window.location.href = 'login.html'; // Redirect if user signs out
         }
     });
 });
